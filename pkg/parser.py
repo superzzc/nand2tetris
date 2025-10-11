@@ -8,7 +8,6 @@ class Parser():
         self.file = open(filename, 'r')
         self.file.seek(0)
         self.current_command = None
-        self.line_number = 0
     
     def hasMoreCommands(self):
         '''
@@ -25,17 +24,13 @@ class Parser():
         从输入中读取下一条命令，并使其成为当前命令
         仅当hasMoreCommands()为真时调用
         '''
-        if self.hasMoreCommands():
+        line = self.file.readline()
+        # 去除注释和空白
+        line = re.split(r'#|//', line)[0].strip()
+        while line == '' and self.hasMoreCommands():
             line = self.file.readline()
-            # 去除注释和空白
             line = re.split(r'#|//', line)[0].strip()
-            while line == '' and self.hasMoreCommands():
-                line = self.file.readline()
-                line = re.split(r'#|//', line)[0].strip()
-            self.current_command = line
-            self.line_number += 1
-        else:
-            self.file.close()
+        self.current_command = line
 
     def commandType(self):
         '''
@@ -65,33 +60,27 @@ class Parser():
         返回当前C_COMMAND的dest部分
         仅当commandType()为C_COMMAND时调用
         '''
-        if self.commandType() == 'C_COMMAND':
-            match = re.match(Parser.c_command_pattern, self.current_command)
-            if match:
-                return match.group(1) if match.group(1) else 'null'
-        return None
+        match = re.match(Parser.c_command_pattern, self.current_command)
+        if match:
+            return match.group(1) if match.group(1) else 'null'
 
     def comp(self):
         '''
         返回当前C_COMMAND的comp部分
         仅当commandType()为C_COMMAND时调用
         '''
-        if self.commandType() == 'C_COMMAND':
-            match = re.match(Parser.c_command_pattern, self.current_command)
-            if match:
-                return match.group(2) if match.group(2) else 'null'
-        return None
+        match = re.match(Parser.c_command_pattern, self.current_command)
+        if match:
+            return match.group(2) if match.group(2) else 'null'
 
     def jump(self):
         '''
         返回当前C_COMMAND的jump部分
         仅当commandType()为C_COMMAND时调用
         '''
-        if self.commandType() == 'C_COMMAND':
-            match = re.match(Parser.c_command_pattern, self.current_command)
-            if match:
-                return match.group(3) if match.group(3) else 'null'
-        return None
+        match = re.match(Parser.c_command_pattern, self.current_command)
+        if match:
+            return match.group(3) if match.group(3) else 'null'
 
     def __del__(self):
         self.file.close()
