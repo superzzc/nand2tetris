@@ -1,7 +1,7 @@
 import re
 class Parser():
-    a_command_pattern = r'^@(.+)$'
-    l_command_pattern = r'^\(([A-Z]+)\)$'
+    a_command_pattern = r'^@(\d+|[\w\.\$:]+)$'
+    l_command_pattern = r'^\([\w\.\$:]+\)$'
     c_command_pattern = r'^(?:(\w+)=)?([\w\+\-\&\|\!]+)(?:;(\w+))?$'
 
     def __init__(self,filename):
