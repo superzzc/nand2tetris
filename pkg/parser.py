@@ -1,8 +1,7 @@
 import re
+from pkg.config import a_command_pattern, l_command_pattern, c_command_pattern
+
 class Parser():
-    a_command_pattern = r'^@(\d+|[\w\.\$:]+)$'
-    l_command_pattern = r'^\([\w\.\$:]+\)$'
-    c_command_pattern = r'^(?:(\w+)=)?([\w\+\-\&\|\!]+)(?:;(\w+))?$'
 
     def __init__(self,filename):
         self.file = open(filename, 'r')
@@ -39,11 +38,11 @@ class Parser():
         C_COMMAND, dest=comp;jump/dest=comp/comp
         L_COMMAND中的一个,(XXX) 例如(LOOP)
         '''
-        if re.match(Parser.a_command_pattern, self.current_command):
+        if re.match(a_command_pattern, self.current_command):
             return 'A_COMMAND'
-        elif re.match(Parser.l_command_pattern, self.current_command):
+        elif re.match(l_command_pattern, self.current_command):
             return 'L_COMMAND'
-        elif re.match(Parser.c_command_pattern, self.current_command):
+        elif re.match(c_command_pattern, self.current_command):
             return 'C_COMMAND'
         else:
             return 'UNKNOWN_COMMAND'
@@ -60,7 +59,7 @@ class Parser():
         返回当前C_COMMAND的dest部分
         仅当commandType()为C_COMMAND时调用
         '''
-        match = re.match(Parser.c_command_pattern, self.current_command)
+        match = re.match(c_command_pattern, self.current_command)
         if match:
             return match.group(1) if match.group(1) else 'null'
 
@@ -69,7 +68,7 @@ class Parser():
         返回当前C_COMMAND的comp部分
         仅当commandType()为C_COMMAND时调用
         '''
-        match = re.match(Parser.c_command_pattern, self.current_command)
+        match = re.match(c_command_pattern, self.current_command)
         if match:
             return match.group(2) if match.group(2) else 'null'
 
@@ -78,7 +77,7 @@ class Parser():
         返回当前C_COMMAND的jump部分
         仅当commandType()为C_COMMAND时调用
         '''
-        match = re.match(Parser.c_command_pattern, self.current_command)
+        match = re.match(c_command_pattern, self.current_command)
         if match:
             return match.group(3) if match.group(3) else 'null'
 

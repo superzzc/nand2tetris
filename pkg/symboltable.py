@@ -1,8 +1,8 @@
 
 import re
-class SymbolTable():
-    l_command_pattern = r'^\(([A-Z]+)\)$'
+from pkg.config import l_command_pattern
 
+class SymbolTable():
     def __init__(self,inputfile):
         self.inputfile=inputfile
         self.var_address=16
@@ -46,12 +46,14 @@ class SymbolTable():
                 if line == '':
                     continue
                 # 匹配L_COMMAND
-                match=re.match(SymbolTable.l_command_pattern,line)
+                match=re.match(l_command_pattern,line)
+                # 伪指令不占用rom地址
                 if match:
                     label=match.group(1)
                     if label not in self.symbols:
                         self.symbols[label]=self.rom_address
-                self.rom_address += 1
+                else:
+                    self.rom_address += 1
 
 
 
