@@ -29,6 +29,7 @@ def main():
                     a_instruction = '0' + format(int(value.group(1)), '015b')
                 elif var:
                     var_label=var.group(1)
+                    # 处理非预定义符号以及标签符号，即变量的情况
                     if var_label not in symboltable.symbols.keys():
                         symboltable.addEntry(var_label)
                     addr = symboltable.getAddress(var_label)
