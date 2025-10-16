@@ -29,19 +29,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@EQ
+@EQ.0
 D;JEQ
-@NEQ
+@NEQ.0
 0;JMP
-(EQ)
+(EQ.0)
 @0
 D=!A
-@CONTINUE
+@GOTO.0
 0;JMP
-(NEQ)
+(NEQ.0)
 @0
 D=A
-(CONTINUE)
+(GOTO.0)
 
 // push result to stack
 @SP
@@ -80,19 +80,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@EQ
+@EQ.1
 D;JEQ
-@NEQ
+@NEQ.1
 0;JMP
-(EQ)
+(EQ.1)
 @0
 D=!A
-@CONTINUE
+@GOTO.1
 0;JMP
-(NEQ)
+(NEQ.1)
 @0
 D=A
-(CONTINUE)
+(GOTO.1)
 
 // push result to stack
 @SP
@@ -131,19 +131,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@EQ
+@EQ.2
 D;JEQ
-@NEQ
+@NEQ.2
 0;JMP
-(EQ)
+(EQ.2)
 @0
 D=!A
-@CONTINUE
+@GOTO.2
 0;JMP
-(NEQ)
+(NEQ.2)
 @0
 D=A
-(CONTINUE)
+(GOTO.2)
 
 // push result to stack
 @SP
@@ -182,19 +182,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@LT
+@LT.3
 D;JLT
-@NLT
+@NLT.3
 0;JMP
-(LT)
+(LT.3)
 @0
 D=!A
-@CONTINUE
+@GOTO.3
 0;JMP
-(NLT)
+(NLT.3)
 @0
 D=A
-(CONTINUE)
+(GOTO.3)
 
 // push result to stack
 @SP
@@ -233,19 +233,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@LT
+@LT.4
 D;JLT
-@NLT
+@NLT.4
 0;JMP
-(LT)
+(LT.4)
 @0
 D=!A
-@CONTINUE
+@GOTO.4
 0;JMP
-(NLT)
+(NLT.4)
 @0
 D=A
-(CONTINUE)
+(GOTO.4)
 
 // push result to stack
 @SP
@@ -284,19 +284,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@LT
+@LT.5
 D;JLT
-@NLT
+@NLT.5
 0;JMP
-(LT)
+(LT.5)
 @0
 D=!A
-@CONTINUE
+@GOTO.5
 0;JMP
-(NLT)
+(NLT.5)
 @0
 D=A
-(CONTINUE)
+(GOTO.5)
 
 // push result to stack
 @SP
@@ -335,19 +335,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@GT
+@GT.6
 D;JGT
-@NGT
+@NGT.6
 0;JMP
-(GT)
+(GT.6)
 @0
 D=!A
-@CONTINUE
+@GOTO.6
 0;JMP
-(NGT)
+(NGT.6)
 @0
 D=A
-(CONTINUE)
+(GOTO.6)
 
 // push result to stack
 @SP
@@ -386,19 +386,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@GT
+@GT.7
 D;JGT
-@NGT
+@NGT.7
 0;JMP
-(GT)
+(GT.7)
 @0
 D=!A
-@CONTINUE
+@GOTO.7
 0;JMP
-(NGT)
+(NGT.7)
 @0
 D=A
-(CONTINUE)
+(GOTO.7)
 
 // push result to stack
 @SP
@@ -437,19 +437,19 @@ M=M-D
 D=M
 
 // eq/gt/lt
-@GT
+@GT.8
 D;JGT
-@NGT
+@NGT.8
 0;JMP
-(GT)
+(GT.8)
 @0
 D=!A
-@CONTINUE
+@GOTO.8
 0;JMP
-(NGT)
+(NGT.8)
 @0
 D=A
-(CONTINUE)
+(GOTO.8)
 
 // push result to stack
 @SP

@@ -1,0 +1,12 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+
+// Executes a sequence of arithmetic and logical operations on the stack. 
+
+push constant 17
+push constant 17
+eq
+push constant 17
+push constant 16
+eq

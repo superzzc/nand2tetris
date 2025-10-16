@@ -9,3 +9,8 @@ vm测试脚本中从RAM[256]开始
 3. True/False的规范
 -1(0xFFFF)表示true
 0(0x0000)表示false
+
+4. 避免翻译出的汇编中出现标签重复定义
+定义标签的时候加点料
+@{op}.{CodeWriter.label_count}
+ ({op}.{CodeWriter.label_count})

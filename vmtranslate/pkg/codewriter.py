@@ -1,6 +1,15 @@
 from textwrap import dedent
 
 class CodeWriter():
+    label_count=0
+    _instance = None
+
+    # 使用单例
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
     def __init__(self, outfile):
         self.outfile=outfile
         self.fd=open(self.outfile,'w')
@@ -121,23 +130,24 @@ class CodeWriter():
         op=opcode.upper()
         asm_2=f'''
         // eq/gt/lt
-        @{op}
+        @{op}.{CodeWriter.label_count}
         D;J{op}
-        @N{op}
+        @N{op}.{CodeWriter.label_count}
         0;JMP
-        ({op})
+        ({op}.{CodeWriter.label_count})
         @0
         D=!A
-        @CONTINUE
+        @GOTO.{CodeWriter.label_count}
         0;JMP
-        (N{op})
+        (N{op}.{CodeWriter.label_count})
         @0
         D=A
-        (CONTINUE)
+        (GOTO.{CodeWriter.label_count})
         '''
         asm_2=dedent(asm_2)
         asm_3=self._push()
         self.fd.write(asm_1+asm_2+asm_3)
+        CodeWriter.label_count += 1
 
     def _write_pop(self):
         '''
