@@ -41,15 +41,17 @@ class CodeWriter():
         if cmds[0] == 'push':
             if cmds[1] == 'constant':
                 x = cmds[2]
-                self.fd.writelines(
-                    (f'@{x}\n',
+                self.fd.writelines((
+                    '// push constant x\n',
+                    f'@{x}\n',
                     'D=A\n',
                     '@SP\n',
                     'A=M\n',
-                    'M=D'
+                    'M=D\n'
                     '@SP\n',
-                    'M=M+1\n')
-                ) 
+                    'M=M+1\n',
+                    '\n'
+                )) 
         elif cmds[0] == 'pop':
             pass
     
@@ -62,6 +64,7 @@ class CodeWriter():
     def _get2ops(self,opcode):
          # 获取两个操作数并运算
         asm=f'''
+        // pop from stack to get 2 ops
         @SP
         M=M-1
         A=M
@@ -72,31 +75,33 @@ class CodeWriter():
         M=M{opcode}D
         D=M
         '''
-        asm=dedent(asm).strip()
+        asm=dedent(asm)
         return asm
     
     def _get1ops(self,opcode):
         # 获取一个操作数,并运算
         asm=f'''
+        // pop from stack to get 1 ops
         @SP
         M=M-1
         A=M
         D=M
         D={opcode}D
         '''
-        asm=dedent(asm).strip() 
+        asm=dedent(asm)
         return asm
     
     def _push(self):
         # 结果入栈操作
         asm='''
+        // push result to stack
         @SP
         A=M
         M=D
         @SP
         M=M+1
         '''
-        asm=dedent(asm).strip()
+        asm=dedent(asm)
         return asm
     
     def _write_2ops(self,opcode):
@@ -115,6 +120,7 @@ class CodeWriter():
         # 
         op=opcode.upper()
         asm_2=f'''
+        // eq/gt/lt
         @{op}
         D;J{op}
         @N{op}
@@ -129,7 +135,7 @@ class CodeWriter():
         D=A
         (CONTINUE)
         '''
-        asm_2=dedent(asm_2).strip()
+        asm_2=dedent(asm_2)
         asm_3=self._push()
         self.fd.write(asm_1+asm_2+asm_3)
 
