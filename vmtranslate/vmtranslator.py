@@ -1,25 +1,24 @@
 #! /usr/bin/python3
 
 import sys
-import os
 from pathlib import Path
 from pkg.parser import Parser
 from pkg.codewriter import CodeWriter
 
 def main():
-    dest=sys.argv[1]
-    if os.path.isdir(dest):
-        for file in os.listdir(dest):
+    dest=Path(sys.argv[1])
+    if dest.is_dir():
+        for file in dest.iterdir():
             if Path(file).suffix == '.vm':
-                full_path = os.path.join(dest,file)
+                full_path = file.absolute()
                 encode_file(full_path)
             
-    elif os.path.isfile(dest):
+    elif dest.is_file(dest):
         encode_file(dest)
 
 def encode_file(file):
         inputfile=file
-        outputfile=file.replace('.vm','.asm')
+        outputfile=file.with_suffix('.asm')
         p=Parser(inputfile)
         c=CodeWriter(outputfile)
         while p.hasMoreCommands():
