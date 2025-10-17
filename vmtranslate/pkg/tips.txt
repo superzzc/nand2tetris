@@ -14,3 +14,12 @@ vm测试脚本中从RAM[256]开始
 定义标签的时候加点料
 @{op}.{CodeWriter.label_count}
  ({op}.{CodeWriter.label_count})
+ 变量也是同样的道理
+
+ 5. 留意temp段的处理，基地址就是5，而非RAM[5]。pointer段同理。
+ 和local this that arg段不同
+
+6. static段的处理
+根据定义，static段在文件内共享，转换到汇编层面，就是要在同一个文件内，可以访问到同一个ram[N]
+通过@filename.index的方式定义变量
+push static 3 => @filename.index D=M 

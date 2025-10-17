@@ -47,7 +47,7 @@ class Parser():
         '''
         返回当前命令的第一个参数,C_RETURN不允许调用
         '''
-        return self.current_cmd.split()[0]
+        return self.current_cmd.split()[1].strip()
         
     
     def arg2(self):
@@ -55,4 +55,4 @@ class Parser():
         返回当前命令的第二个参数, C_PUSH C_POP C_FUNCTION C_CALL
         类型命令才允许调用
         '''
-        return self.current_cmd.split()[1]
+        return self.current_cmd.split()[2].strip()

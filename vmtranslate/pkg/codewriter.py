@@ -1,7 +1,9 @@
 from textwrap import dedent
+import os
 
 class CodeWriter():
     label_count=0
+    var_count=0
     _instance = None
 
     # 使用单例
@@ -39,29 +41,81 @@ class CodeWriter():
             self._write_cmpops(arit_cmd)
         
 
-    def writePushPop(self,stack_cmd):
+    def writePushPop(self,cmd_type,segment,index):
         '''
         将push、pop操作翻译为汇编写到文件
         push segment index 将segment[index]压入stack
         pop segment index 将segment[index]弹出stack
         '''
-        # stage 1: 先实现push constant x命令
-        cmds=stack_cmd.split()
-        if cmds[0] == 'push':
-            if cmds[1] == 'constant':
-                x = cmds[2]
-                self.fd.writelines((
-                    '// push constant x\n',
-                    f'@{x}\n',
-                    'D=A\n',
-                    '@SP\n',
-                    'A=M\n',
-                    'M=D\n'
-                    '@SP\n',
-                    'M=M+1\n',
-                    '\n'
-                )) 
-        elif cmds[0] == 'pop':
+        mem2reg = {
+            'argument':'ARG',
+            'local':'LCL',
+            'this':'THIS',
+            'that':'THAT',
+            'temp':5,
+            'pointer':3,
+            'static':'NULL'
+        }
+        filename=os.path.basename(self.outfile)
+        if cmd_type == 'C_PUSH':
+            # stage 1: 实现push constant x命令
+            if segment == 'constant':
+                x = index
+                asm = f'''
+                // push constant x
+                @{x}
+                D=A
+                @SP
+                A=M
+                M=D
+                @SP
+                M=M+1
+                '''
+                asm = dedent(asm)
+                self.fd.write(asm)
+
+            # stage 2: 实现剩余内存段的处理
+            # local arg this that temp pointer 
+            elif segment in mem2reg.keys():
+                reg = mem2reg[segment]
+                asm_1=f'''
+                // push {segment} {index}
+                // M[{segment}[{index}]]
+                @{reg if reg !='NULL' else f'{filename}.{index}'}
+                D={'M' if segment not in ('temp','pointer')  else 'A'}
+                @{index if reg!='NULL' else 0}
+                A=D+A
+                D=M
+                '''
+                asm_1=dedent(asm_1)
+                asm_2=self._push()
+                self.fd.write(asm_1+asm_2)
+
+        elif cmd_type == 'C_POP':
+            asm_1=f'// pop {segment} {index}\n'
+            asm_2=self._pop()
+            # local arg this that temp pointer
+            if segment in mem2reg.keys():
+                reg = mem2reg[segment]
+                asm_3=f'''
+                @tmp.{CodeWriter.var_count}
+                M=D
+                // M[{segment}[{index}]]
+                @{reg if reg !='NULL' else f'{filename}.{index}'}
+                D={'M' if segment not in ('temp','pointer')  else 'A'}
+                @{index if reg!='NULL' else 0}
+                D=D+A
+                @addr.{CodeWriter.var_count}
+                M=D
+                @tmp.{CodeWriter.var_count}
+                D=M
+                @addr.{CodeWriter.var_count}
+                A=M
+                M=D
+                '''
+                asm_3=dedent(asm_3)
+                self.fd.write(asm_1+asm_2+asm_3)
+                CodeWriter.var_count += 1
             pass
     
     def close(self):
@@ -101,14 +155,26 @@ class CodeWriter():
         return asm
     
     def _push(self):
-        # 结果入栈操作
+        # D reg 入栈操作
         asm='''
-        // push result to stack
+        // push D reg value to stack
         @SP
         A=M
         M=D
         @SP
         M=M+1
+        '''
+        asm=dedent(asm)
+        return asm
+    
+    def _pop(self): 
+        # 出栈操作 D reg
+        asm='''
+        // pop value to D reg
+        @SP
+        M=M-1
+        A=M
+        D=M
         '''
         asm=dedent(asm)
         return asm
@@ -148,14 +214,3 @@ class CodeWriter():
         asm_3=self._push()
         self.fd.write(asm_1+asm_2+asm_3)
         CodeWriter.label_count += 1
-
-    def _write_pop(self):
-        '''
-        生成对应pop命令的汇编指令
-        '''
-
-        
-    def _write_push(self):
-         '''
-        生成push命令的汇编指令
-        '''

@@ -1,11 +1,3 @@
-// push constant x
-@17
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
 
 // push constant x
 @17
@@ -16,6 +8,14 @@ M=D
 @SP
 M=M+1
 
+// push constant x
+@17
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 
 // pop from stack to get 2 ops
 @SP
@@ -43,12 +43,13 @@ D=!A
 D=A
 (GOTO.0)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @17
 D=A
@@ -66,7 +67,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -94,12 +94,13 @@ D=!A
 D=A
 (GOTO.1)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @16
 D=A
@@ -117,7 +118,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -145,12 +145,13 @@ D=!A
 D=A
 (GOTO.2)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @892
 D=A
@@ -168,7 +169,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -196,12 +196,13 @@ D=!A
 D=A
 (GOTO.3)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @891
 D=A
@@ -219,7 +220,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -247,15 +247,7 @@ D=!A
 D=A
 (GOTO.4)
 
-// push result to stack
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant x
-@891
-D=A
+// push D reg value to stack
 @SP
 A=M
 M=D
@@ -271,6 +263,14 @@ M=D
 @SP
 M=M+1
 
+// push constant x
+@891
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 
 // pop from stack to get 2 ops
 @SP
@@ -298,12 +298,13 @@ D=!A
 D=A
 (GOTO.5)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @32767
 D=A
@@ -321,7 +322,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -349,12 +349,13 @@ D=!A
 D=A
 (GOTO.6)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @32766
 D=A
@@ -372,7 +373,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -400,15 +400,7 @@ D=!A
 D=A
 (GOTO.7)
 
-// push result to stack
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant x
-@32766
-D=A
+// push D reg value to stack
 @SP
 A=M
 M=D
@@ -424,6 +416,14 @@ M=D
 @SP
 M=M+1
 
+// push constant x
+@32766
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 
 // pop from stack to get 2 ops
 @SP
@@ -451,12 +451,13 @@ D=!A
 D=A
 (GOTO.8)
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @57
 D=A
@@ -484,7 +485,6 @@ M=D
 @SP
 M=M+1
 
-
 // pop from stack to get 2 ops
 @SP
 M=M-1
@@ -496,12 +496,13 @@ A=M
 M=M+D
 D=M
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @112
 D=A
@@ -510,7 +511,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -523,7 +523,7 @@ A=M
 M=M-D
 D=M
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
@@ -537,7 +537,7 @@ A=M
 D=M
 D=-D
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
@@ -555,12 +555,13 @@ A=M
 M=M&D
 D=M
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
 @SP
 M=M+1
+
 // push constant x
 @82
 D=A
@@ -569,7 +570,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 
 // pop from stack to get 2 ops
 @SP
@@ -582,7 +582,7 @@ A=M
 M=M|D
 D=M
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
@@ -596,7 +596,7 @@ A=M
 D=M
 D=!D
 
-// push result to stack
+// push D reg value to stack
 @SP
 A=M
 M=D
