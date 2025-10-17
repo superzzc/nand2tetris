@@ -40,7 +40,6 @@ class CodeWriter():
         elif arit_cmd in ops_cmp:
             self._write_cmpops(arit_cmd)
         
-
     def writePushPop(self,cmd_type,segment,index):
         '''
         将push、pop操作翻译为汇编写到文件
@@ -118,6 +117,39 @@ class CodeWriter():
                 CodeWriter.var_count += 1
             pass
     
+    def writeLabel(self, label):
+        '''
+        生成label xxx对应的asm
+        '''
+        asm=f'''
+        ({label})
+        '''
+        asm=dedent(asm)
+        self.fd.write(asm)
+
+    def writeGoto(self,label):
+        '''
+        生成goto对应的asm
+        '''
+        asm=f'''
+        @{label}
+        0;JMP
+        '''
+        asm=dedent(asm)
+        self.fd.write(asm)
+    
+    def writeIf(self,label):
+        '''
+        生成if-goto对应的asm
+        '''
+        asm_1=self._pop()
+        asm_2=f'''
+        @{label}
+        D;JNE
+        '''
+        asm_2=dedent(asm_2)
+        self.fd.write(asm_1+asm_2)
+        
     def close(self):
         '''
         显式关闭outIO

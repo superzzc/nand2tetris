@@ -13,7 +13,7 @@ def main():
                 full_path = file.absolute()
                 encode_file(full_path)
             
-    elif dest.is_file(dest):
+    elif dest.is_file():
         encode_file(dest)
 
 def encode_file(file):
@@ -28,6 +28,12 @@ def encode_file(file):
                 c.writeArithmetic(p.current_cmd)
             elif cmd_type=='C_PUSH' or cmd_type=='C_POP':
                 c.writePushPop(cmd_type,p.arg1(),p.arg2())
+            elif cmd_type=='C_LABEL':
+                c.writeLabel(p.arg1())
+            elif cmd_type=='C_GOTO':
+                c.writeGoto(p.arg1())
+            elif cmd_type=='C_IF':
+                c.writeIf(p.arg1())
         c.close()
 
 

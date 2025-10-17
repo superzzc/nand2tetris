@@ -34,14 +34,26 @@ class Parser():
         C_ARITHMETIC C_PUSH C_POP C_LABEL C_GOTO C_IF
         C_FUNCTION C_RETURN C_CALL
         '''
-        # stage 1：实现算数与逻辑命令以及push constant x命令
+        # 算数及内存访问指令
         if  self.current_cmd in Arithmetic_label:
             return 'C_ARITHMETIC'
         elif self.current_cmd.split()[0] == 'push':
             return 'C_PUSH'
         elif self.current_cmd.split()[0] == 'pop':
             return 'C_POP'
-        # stage 2:实现内存访问命令
+        # 流程控制及函数调用
+        elif self.current_cmd.split()[0] == 'label':
+            return 'C_LABEL'
+        elif self.current_cmd.split()[0] == 'goto':
+            return 'C_GOTO'
+        elif self.current_cmd.split()[0] == 'if-goto':
+            return 'C_IF'
+        elif self.current_cmd.split()[0] == 'function':
+            return 'C_FUNCTION'
+        elif self.current_cmd.split()[0] == 'return':
+            return 'C_RETURN'
+        elif self.current_cmd.split()[0] == 'call':
+            return 'C_CALL'
 
     def arg1(self):
         '''

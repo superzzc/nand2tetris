@@ -1,3 +1,4 @@
+# chap7
 1. constant 段处理方式
 虚拟的，不占用目标平台上的物理存储。
 vm实现通过简单提供常数i来处理任何vm对<constant i>的访问
@@ -22,4 +23,6 @@ vm测试脚本中从RAM[256]开始
 6. static段的处理
 根据定义，static段在文件内共享，转换到汇编层面，就是要在同一个文件内，可以访问到同一个ram[N]
 通过@filename.index的方式定义变量
-push static 3 => @filename.index D=M 
+push static 3 => @filename.index D=M
+
+#chap 8
