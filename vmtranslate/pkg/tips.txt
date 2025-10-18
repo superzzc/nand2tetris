@@ -26,3 +26,7 @@ vm测试脚本中从RAM[256]开始
 push static 3 => @filename.index D=M
 
 #chap 8
+1. 將call時初始化function中k個local变量为0的任务提前到定义function的时候
+处理call的时候留意避免重复压入
+
+2. 翻译return的时候，留意栈顶SP位置，因为arg[0]新增了result，SP = arg+1
