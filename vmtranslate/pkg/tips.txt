@@ -29,4 +29,23 @@ push static 3 => @filename.index D=M
 1. 將call時初始化function中k個local变量为0的任务提前到定义function的时候
 处理call的时候留意避免重复压入
 
-2. 翻译return的时候，留意栈顶SP位置，因为arg[0]新增了result，SP = arg+1
+2. 翻译return的时候，SP = arg+1
+留意栈顶SP位置，因为arg[0]新增了result
+
+3. Sys.init引导程序必须确保位于汇编文件的开头
+放在Codewriter实例初始化阶段完成
+
+4. return addr的确定
+由于hack体系中每条命令宽度固定为1个字，return addr = 当前call命令地址+1
+call命令地址在asm汇编阶段才能确定。幸好我们不需要获得确切的PC，只需要在合适的位置生成标签来代替就好。
+在vm层面，标签位置如下,转换到汇编层面，就是紧跟着call汇编命令末尾
+call f N
+(label)  <---- return addr
+next command
+
+5. call f n的语义
+在n个参数被压入栈后调用函数f() 。换句话说，参数的压入是有
+调用者在call之前自行处理的，不放在call f n的实现内。call f N
+只需要设置正确的ARG指针即可
+
+6. call f 0调用没有传递参数的时候，arg段的处理 

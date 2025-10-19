@@ -6,6 +6,7 @@ class CodeWriter:
     label_count = 0
     var_count = 0
     return_count = 0
+    call_count = 0
     _instance = None
 
     # 使用单例
@@ -17,6 +18,7 @@ class CodeWriter:
     def __init__(self, outfile):
         self.outfile = outfile
         self.fd = open(self.outfile, "w")
+        self._boottrap()
 
     def writeArithmetic(self, arit_cmd):
         """
@@ -201,6 +203,44 @@ class CodeWriter:
         self.fd.write(asm_1 + asm_2 + asm_3 + asm_4 + asm_5)
         CodeWriter.return_count += 1
 
+    def writeCall(self, funcName, numArgs):
+        """
+        生成call对应的asm
+        """
+        asm_1 = f"""
+        // call {funcName} {numArgs}
+        @return_{funcName}.{CodeWriter.call_count}
+        D=A
+        """
+        asm_1 = dedent(asm_1)
+        # 将返回地址入栈
+        asm_2 = self._push()
+        # 将调用者的寄存器变量入栈
+        asm_3 = self._save_reg()
+        # 设置ARG及LCL
+        asm_4 = f"""
+        @SP
+        D=M
+        @{5+int(numArgs)}
+        D=D-A
+        @ARG
+        M=D
+        @SP
+        D=M
+        @LCL
+        M=D
+        """
+        asm_4 = dedent(asm_4)
+        self.fd.write(asm_1 + asm_2 + asm_3 + asm_4)
+        # 控制流跳转
+        self.writeGoto(funcName)
+        # 返回地址标签
+        self.fd.write(f"(return_{funcName}.{CodeWriter.call_count})\n")
+        # for debug info
+        self.fd.write(f"// end of call {funcName} {numArgs} translation\n")
+        # 更新count，确保标签唯一
+        CodeWriter.call_count += 1
+
     def close(self):
         """
         显式关闭outIO
@@ -298,7 +338,26 @@ class CodeWriter:
         self.fd.write(asm_1 + asm_2 + asm_3)
         CodeWriter.label_count += 1
 
+    def _save_reg(self):
+        """
+        函数调用时，将调用者的寄存器值保存到栈上
+        """
+        reg_list = ["LCL", "ARG", "THIS", "THAT"]
+        asm = ""
+        for i in range(len(reg_list)):
+            asm_1 = f"""
+            @{reg_list[i]}
+            D=M
+            """
+            asm_1 = dedent(asm_1)
+            asm_2 = self._push()
+            asm += asm_1 + asm_2
+        return asm
+
     def _reset_reg(self):
+        """
+        函数返回时，从栈上还原保存的寄存器值
+        """
         reg_list = ["LCL", "ARG", "THIS", "THAT"]
         asm = ""
         for i in range(len(reg_list)):
@@ -315,3 +374,19 @@ class CodeWriter:
             asm += asm_1
         asm = dedent(asm)
         return asm
+
+    def _boottrap(self):
+        """
+        生成vm引导程序对应的asm
+        """
+        asm_1 = f"""
+        // init SP point to RAM[256]
+        @256
+        D=A
+        @SP
+        M=D
+        """
+        asm_1 = dedent(asm_1)
+        self.fd.write(asm_1)
+        self.writeCall("Sys.init", 0)
+        # Sys.init will never return
