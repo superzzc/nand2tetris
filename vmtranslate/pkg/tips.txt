@@ -48,4 +48,18 @@ next command
 调用者在call之前自行处理的，不放在call f n的实现内。call f N
 只需要设置正确的ARG指针即可
 
-6. call f 0调用没有传递参数的时候，arg段的处理 
+6. call f 0调用没有传递参数的时候，arg段的处理?
+正常处理，此时arg指向栈上存放return-address的单元。当然，函数内不应该有arg段的任何引用
+
+7. 留意标准映射中的符号约定
+funcName$label
+函数内的label、goto、if-goto命令生成的label都应该使用f$b的形式
+vm命令没有缩进概念，出现在function xxx声明后的都属于函数的作用域，直到碰到下一个function声明
+
+8.return-address
+每个函数调用时应该生成的唯一标号。
+同一个函数是否生成相同的标签？ 不行，考虑统一函数多次调用的情况
+
+9.实现return指令的时候，是否可以使用同一个临时变量保存返回地址？
+可以。同一时刻只能处理一个return，返回后，变量中的return-address就没用了，可以覆盖。
+不需要每次遇到return的时候都新分配一个临时变量

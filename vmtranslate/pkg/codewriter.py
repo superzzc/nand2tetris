@@ -5,9 +5,9 @@ import os
 class CodeWriter:
     label_count = 0
     var_count = 0
-    return_count = 0
     call_count = 0
     _instance = None
+    _current_function = None
 
     # 使用单例
     def __new__(cls, *args, **kwargs):
@@ -118,7 +118,7 @@ class CodeWriter:
         生成label xxx对应的asm
         """
         asm = f"""
-        ({label})
+        ({label if not self._current_function else f'{self._current_function}${label}'})
         """
         asm = dedent(asm)
         self.fd.write(asm)
@@ -128,7 +128,7 @@ class CodeWriter:
         生成goto对应的asm
         """
         asm = f"""
-        @{label}
+        @{label if not self._current_function else f'{self._current_function}${label}'}
         0;JMP
         """
         asm = dedent(asm)
@@ -140,7 +140,7 @@ class CodeWriter:
         """
         asm_1 = self._pop()
         asm_2 = f"""
-        @{label}
+        @{label if not self._current_function else f'{self._current_function}${label}'}
         D;JNE
         """
         asm_2 = dedent(asm_2)
@@ -150,6 +150,7 @@ class CodeWriter:
         """
         生成function f k 對應的asm
         """
+        self._current_function = funcName
         asm = f"({funcName})\n"
         for _ in range(int(numArgs)):
             asm_1 = """
@@ -172,7 +173,7 @@ class CodeWriter:
         D=M
         @5
         D=D-A
-        @return_addr.{CodeWriter.return_count}
+        @R13
         M=D
         """
         asm_1 = dedent(asm_1)
@@ -195,13 +196,12 @@ class CodeWriter:
         asm_4 = self._reset_reg()
         # 跳转到返回地址继续执行
         asm_5 = f"""
-        @return_addr.{CodeWriter.return_count}
+        @R13
         A=M
         0;JMP
         """
         asm_5 = dedent(asm_5)
         self.fd.write(asm_1 + asm_2 + asm_3 + asm_4 + asm_5)
-        CodeWriter.return_count += 1
 
     def writeCall(self, funcName, numArgs):
         """
@@ -209,7 +209,7 @@ class CodeWriter:
         """
         asm_1 = f"""
         // call {funcName} {numArgs}
-        @return_{funcName}.{CodeWriter.call_count}
+        @return-address.{funcName}.{CodeWriter.call_count}
         D=A
         """
         asm_1 = dedent(asm_1)
@@ -231,11 +231,15 @@ class CodeWriter:
         M=D
         """
         asm_4 = dedent(asm_4)
-        self.fd.write(asm_1 + asm_2 + asm_3 + asm_4)
         # 控制流跳转
-        self.writeGoto(funcName)
+        asm_5 = f"""
+        @{funcName}
+        0;JMP
+        """
+        asm_5 = dedent(asm_5)
+        self.fd.write(asm_1 + asm_2 + asm_3 + asm_4 + asm_5)
         # 返回地址标签
-        self.fd.write(f"(return_{funcName}.{CodeWriter.call_count})\n")
+        self.fd.write(f"(return-address.{funcName}.{CodeWriter.call_count})\n")
         # for debug info
         self.fd.write(f"// end of call {funcName} {numArgs} translation\n")
         # 更新count，确保标签唯一
@@ -348,10 +352,10 @@ class CodeWriter:
             asm_1 = f"""
             @{reg_list[i]}
             D=M
+            {self._push}
             """
             asm_1 = dedent(asm_1)
-            asm_2 = self._push()
-            asm += asm_1 + asm_2
+            asm += asm_1
         return asm
 
     def _reset_reg(self):
@@ -363,7 +367,7 @@ class CodeWriter:
         for i in range(len(reg_list)):
             asm_1 = f"""
             // reset {reg_list[i]} from stack
-            @return_addr.{CodeWriter.return_count}
+            @R13
             D=M
             @{i+1}
             A=D+A

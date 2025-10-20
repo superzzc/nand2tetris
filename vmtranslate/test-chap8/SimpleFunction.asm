@@ -153,7 +153,7 @@ M=M+1
 D=M
 @5
 D=D-A
-@return_addr.0
+@R13
 M=D
 
 // pop value to D reg
@@ -174,7 +174,7 @@ D=D+1
 M=D
 
 // reset LCL from stack
-@return_addr.0
+@R13
 D=M
 @1
 A=D+A
@@ -183,7 +183,7 @@ D=M
 M=D
 
 // reset ARG from stack
-@return_addr.0
+@R13
 D=M
 @2
 A=D+A
@@ -192,7 +192,7 @@ D=M
 M=D
 
 // reset THIS from stack
-@return_addr.0
+@R13
 D=M
 @3
 A=D+A
@@ -201,7 +201,7 @@ D=M
 M=D
 
 // reset THAT from stack
-@return_addr.0
+@R13
 D=M
 @4
 A=D+A
@@ -209,6 +209,6 @@ D=M
 @THAT
 M=D
 
-@return_addr.0
+@R13
 A=M
 0;JMP

@@ -46,6 +46,5 @@ def encode_file(inputfile, c):
         elif cmd_type == "C_CALL":
             c.writeCall(p.arg1(), p.arg2())
 
-
 if __name__ == "__main__":
     main()
