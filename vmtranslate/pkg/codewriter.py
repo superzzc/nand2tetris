@@ -198,6 +198,7 @@ class CodeWriter:
         asm_5 = f"""
         @R13
         A=M
+        A=M
         0;JMP
         """
         asm_5 = dedent(asm_5)
@@ -349,13 +350,15 @@ class CodeWriter:
         reg_list = ["LCL", "ARG", "THIS", "THAT"]
         asm = ""
         for i in range(len(reg_list)):
+            
             asm_1 = f"""
             @{reg_list[i]}
             D=M
-            {self._push}
             """
             asm_1 = dedent(asm_1)
-            asm += asm_1
+            asm_2= self._push()
+            asm_2=dedent(asm_2)
+            asm += (asm_1+asm_2)
         return asm
 
     def _reset_reg(self):

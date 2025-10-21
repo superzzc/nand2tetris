@@ -222,6 +222,7 @@ M=D
 
 @R13
 A=M
+A=M
 0;JMP
 
 (Main.fibonacci$N_GE_2)
@@ -524,6 +525,7 @@ D=M
 M=D
 
 @R13
+A=M
 A=M
 0;JMP
 (Sys.init)
