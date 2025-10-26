@@ -156,6 +156,14 @@ D=D-A
 @R13
 M=D
 
+@LCL
+D=M
+@5
+A=D-A
+D=M
+@R14
+M=D
+
 // pop value to D reg
 @SP
 M=M-1
@@ -209,6 +217,6 @@ D=M
 @THAT
 M=D
 
-@R13
+@R14
 A=M
 0;JMP

@@ -181,6 +181,14 @@ class CodeWriter:
         D=D-A
         @R13
         M=D
+
+        @LCL
+        D=M
+        @5
+        A=D-A
+        D=M
+        @R14
+        M=D
         """
         asm_1 = dedent(asm_1)
         # 将返回值压入arg段底部
@@ -202,8 +210,7 @@ class CodeWriter:
         asm_4 = self._reset_reg()
         # 跳转到返回地址继续执行
         asm_5 = f"""
-        @R13
-        A=M
+        @R14
         A=M
         0;JMP
         """
