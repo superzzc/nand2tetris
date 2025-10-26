@@ -356,15 +356,15 @@ class CodeWriter:
         reg_list = ["LCL", "ARG", "THIS", "THAT"]
         asm = ""
         for i in range(len(reg_list)):
-            
+
             asm_1 = f"""
             @{reg_list[i]}
             D=M
             """
             asm_1 = dedent(asm_1)
-            asm_2= self._push()
-            asm_2=dedent(asm_2)
-            asm += (asm_1+asm_2)
+            asm_2 = self._push()
+            asm_2 = dedent(asm_2)
+            asm += asm_1 + asm_2
         return asm
 
     def _reset_reg(self):
