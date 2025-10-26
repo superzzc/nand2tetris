@@ -1,3 +1,4 @@
+# chap7
 1. constant 段处理方式
 虚拟的，不占用目标平台上的物理存储。
 vm实现通过简单提供常数i来处理任何vm对<constant i>的访问
@@ -22,4 +23,63 @@ vm测试脚本中从RAM[256]开始
 6. static段的处理
 根据定义，static段在文件内共享，转换到汇编层面，就是要在同一个文件内，可以访问到同一个ram[N]
 通过@filename.index的方式定义变量
-push static 3 => @filename.index D=M 
+push static 3 => @filename.index D=M
+
+#chap 8
+1. 將call時初始化function中k個local变量为0的任务提前到定义function的时候
+处理call的时候留意避免重复压入
+
+2. 翻译return的时候，SP = arg+1
+留意栈顶SP位置，因为arg[0]新增了result
+
+3. Sys.init引导程序必须确保位于汇编文件的开头
+放在Codewriter实例初始化阶段完成
+
+4. return addr的确定
+call命令地址在asm汇编阶段才能确定。幸好我们不需要获得确切的PC，只需要在合适的位置生成标签来代替就好。
+在vm层面，标签位置如下,转换到汇编层面，就是紧跟着call汇编命令末尾
+call f N
+(label)  <---- return addr
+next command
+
+5. call f n的语义
+在n个参数被压入栈后调用函数f() 。换句话说，参数的压入是有
+调用者在call之前自行处理的，不放在call f n的实现内。call f N
+只需要设置正确的ARG指针即可
+
+6. call f 0调用没有传递参数的时候，arg段的处理?
+正常处理，此时arg指向栈上存放return-address的单元。当然，函数内不应该有arg段的任何引用
+
+7. 留意标准映射中的符号约定
+funcName$label
+函数内的label、goto、if-goto命令生成的label都应该使用f$b的形式
+vm命令没有缩进概念，出现在function xxx声明后的都属于函数的作用域，直到碰到下一个function声明
+
+8.return-address
+每个函数调用时应该生成的唯一标号。
+同一个函数是否生成相同的标签？ 不行，考虑统一函数多次调用的情况
+
+9.实现return指令的时候，是否可以使用同一个临时变量保存返回地址？
+可以。同一时刻只能处理一个return，返回后，变量中的return-address就没用了，可以覆盖。
+不需要每次遇到return的时候都新分配一个临时变量
+临时变量只保存了存放返回地址的地址
+// get return addr
+@LCL
+D=M
+@5
+D=D-A
+@R13
+M=D
+所以返回跳转时，需要引用两次，这里容易踩坑
+@R13
+A=M     --->获取存放ret的地址
+A=M     --->再次引用，获取ret的值
+0;JMP
+
+这里只保存存放ret的地址，也是有问题的，因为arg[0]要存放函数返回值，没有参数压入的时候
+arg[0] 也指向了存放ret地址的单元。这里被覆盖的话，通过R13引用两次过来，获取的也是错误的返回地址。
+
+
+10. 处理static段的时候，留意chap7中已经提供的setFileName接口
+
+
