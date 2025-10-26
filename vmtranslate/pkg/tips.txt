@@ -76,3 +76,5 @@ A=M     --->获取存放ret的地址
 A=M     --->再次引用，获取ret的值
 0;JMP
 
+10. 处理static段的时候，留意chap7中已经提供的setFileName接口
+

@@ -32,6 +32,7 @@ def encode_file(inputfile, c):
         if cmd_type == "C_ARITHMETIC":
             c.writeArithmetic(p.current_cmd)
         elif cmd_type == "C_PUSH" or cmd_type == "C_POP":
+            c.setFileName(inputfile.stem)
             c.writePushPop(cmd_type, p.arg1(), p.arg2())
         elif cmd_type == "C_LABEL":
             c.writeLabel(p.arg1())

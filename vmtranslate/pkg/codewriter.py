@@ -19,6 +19,13 @@ class CodeWriter:
         self.outfile = outfile
         self.fd = open(self.outfile, "w")
         self._boottrap()
+        self.srcfile = None
+
+    def setFileName(self, filename):
+        """
+        告诉codewriter当前正在翻译哪个VM文件
+        """
+        self.srcfile = filename
 
     def writeArithmetic(self, arit_cmd):
         """
@@ -51,7 +58,6 @@ class CodeWriter:
             "pointer": 3,
             "static": "NULL",
         }
-        filename = os.path.basename(self.outfile)
         if cmd_type == "C_PUSH":
             # stage 1: 实现push constant x命令
             if segment == "constant":
@@ -76,8 +82,8 @@ class CodeWriter:
                 asm_1 = f"""
                 // push {segment} {index}
                 // M[{segment}[{index}]]
-                @{reg if reg !='NULL' else f'{filename}.{index}'}
-                D={'M' if segment not in ('temp','pointer')  else 'A'}
+                @{reg if reg !='NULL' else f'{self.srcfile}.{index}'}
+                D={'M' if segment not in ('temp','pointer','static')  else 'A'}
                 @{index if reg!='NULL' else 0}
                 A=D+A
                 D=M
@@ -96,8 +102,8 @@ class CodeWriter:
                 @tmp.{CodeWriter.var_count}
                 M=D
                 // M[{segment}[{index}]]
-                @{reg if reg !='NULL' else f'{filename}.{index}'}
-                D={'M' if segment not in ('temp','pointer')  else 'A'}
+                @{reg if reg !='NULL' else f'{self.srcfile}.{index}'}
+                D={'M' if segment not in ('temp','pointer','static')  else 'A'}
                 @{index if reg!='NULL' else 0}
                 D=D+A
                 @addr.{CodeWriter.var_count}
