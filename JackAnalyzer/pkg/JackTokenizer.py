@@ -27,6 +27,11 @@ class JackTokenizer:
         """
         self.index += 1
         self.current_token = self.tokens[self.index]
+    
+    def stepback(self):
+        self.index -= 1
+        self.current_token = self.tokens[self.index]
+   
 
     def tokenType(self):
         if re.match(p_keyword,self.current_token):
@@ -57,6 +62,7 @@ class JackTokenizer:
 
         pattern = re.compile(r'^"(.*)"$')
         return pattern.sub(r"\1", self.current_token)
+    
 
     def __remove_comment(self, code):
         pattern = re.compile(

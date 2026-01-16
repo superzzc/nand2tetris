@@ -32,6 +32,9 @@ keyword_list = [
 symbol_list = [
     '{','}','(',')','[',']','.',';',',','+','-','*','/','&','|','<','>','=','~'
 ]
+symbol_op=['+','-','*','/','~']
+
+keyword_const=['true','false','null','this']
 
 # 转义符号
 escaped_symbols = ''.join(map(re.escape, symbol_list))

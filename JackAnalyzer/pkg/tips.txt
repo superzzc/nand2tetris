@@ -1,0 +1,5 @@
+约定：
+1. 调用compilexxx()的时候，index位于xxx要素的前一个token。
+即compilexxx内advance一次后，命中xxx要素的第一个token
+
+2. compilexxx()处理到属于xxx的最后一个token即返回
