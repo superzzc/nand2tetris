@@ -1,6 +1,6 @@
 from pkg.JackTokenizer import JackTokenizer
 import xml.etree.ElementTree as ET
-from pkg.config import symbol_op,keyword_const
+from pkg.config import symbol_op,keyword_const,unaryOP
 
 
 class CompilationEngine:
@@ -170,24 +170,26 @@ class CompilationEngine:
         let = ET.SubElement(Element,'letStatement')
         keyword_let=ET.SubElement(let,'keyword')
         keyword_let.text=self.tokenizer.keyword()
-        while self.tokenizer.hasMoreCommands():
+        # varName
+        self.tokenizer.advance()
+        varName=ET.SubElement(let,'identifier')
+        varName.text=self.tokenizer.indentifier()
+        # [ or =
+        self.tokenizer.advance()
+        symbol = ET.SubElement(let,'symbol')
+        symbol.text=self.tokenizer.symbol()
+        # [expression] ?
+        if self.tokenizer.symbol()=='[':
+            # expression
+            self.CompileExpression(let)
+            # ]
             self.tokenizer.advance()
-            if self.tokenizer.current_token == "=":
-                break
-            # varName
-            if self.tokenizer.tokenType() == "identifier":
-                ident = ET.SubElement(let, "identifier")
-                ident.text = self.tokenizer.indentifier()
-            # [ ]
-            elif self.tokenizer.tokenType() == "symbol":
-                symbol_left = ET.SubElement(let, "symbol")
-                symbol_left.text = self.tokenizer.symbol()
-            else:
-                self.CompileExpression(let)
-        # =
-        symbol_eq=ET.SubElement(let,'symbol')
-        symbol_eq.text=self.tokenizer.symbol()
-        # expr
+            symbol = ET.SubElement(let,'symbol')
+            symbol.text=self.tokenizer.symbol()
+            # =
+            self.tokenizer.advance()
+            symbol = ET.SubElement(let,'symbol')
+            symbol.text=self.tokenizer.symbol()
         self.CompileExpression(let)
         # ;
         self.tokenizer.advance()
@@ -311,6 +313,7 @@ class CompilationEngine:
         expressionList = ET.SubElement(Element, "expressionList")
         # 强制不使用自闭合标签，textcompare比较使用，测试通过后可去掉
         expressionList.text='\n'
+        # 处理无表达式情况
         if self.tokenizer.tokens[self.tokenizer.index+1] == ")":
             return
         self.CompileExpression(expressionList)
@@ -335,14 +338,17 @@ class CompilationEngine:
         term=ET.SubElement(Element,'term')
         while self.tokenizer.hasMoreCommands():
             self.tokenizer.advance()
+            # int val
             if self.tokenizer.tokenType()=='integerConstant':
                 integer=ET.SubElement(term,'integerConstant')
                 integer.text=str(self.tokenizer.intVal())
                 break
+            # str val
             elif self.tokenizer.tokenType()=='stringConstant':
                 string=ET.SubElement(term,'stringConstant')
                 string.text=self.tokenizer.stringVal()
                 break
+            # keyword const
             elif self.tokenizer.tokenType()=='keyword' and self.tokenizer.current_token in keyword_const:
                 key_const=ET.SubElement(term,'keyword')
                 key_const.text=self.tokenizer.keyword()
@@ -350,8 +356,39 @@ class CompilationEngine:
             elif self.tokenizer.tokenType()=='identifier':
                 ident=ET.SubElement(term,'identifier')
                 ident.text=self.tokenizer.indentifier()
+                self.tokenizer.advance()
+                # array
+                if self.tokenizer.tokenType()=='symbol' and self. tokenizer.current_token=='[':
+                    self.tokenizer.stepback()
+                    self.__CompileArray(term)
+                # subroutinecall
+                elif self.tokenizer.tokenType()=='symbol' and self. tokenizer.current_token in ('(','.'):
+                    self.tokenizer.stepback()
+                    self.__CompileSubCall(term)
+                # varName
+                else:
+                    self.tokenizer.stepback()
                 break
-            # 更多情况后面再处理
+            # '('expression')'
+            elif self.tokenizer.tokenType()=='symbol' and self.tokenizer.symbol()=='(':
+                # (
+                symbol=ET.SubElement(term,'symbol')
+                symbol.text=self.tokenizer.symbol()
+                # expression
+                self.CompileExpression(term)
+                # )
+                self.tokenizer.advance()
+                symbol=ET.SubElement(term,'symbol')
+                symbol.text=self.tokenizer.symbol()
+                break
+            # unaryop term
+            elif self.tokenizer.tokenType()=='symbol' and self.tokenizer.symbol() in unaryOP:
+                # - ~
+                unaryop=ET.SubElement(term,'symbol')
+                unaryop.text=self.tokenizer.symbol()
+                # term
+                self.CompileTerm(term)
+                break
 
     def __parse_until(self, rootElem, end):
         while self.tokenizer.hasMoreCommands():
@@ -367,3 +404,37 @@ class CompilationEngine:
             elif self.tokenizer.tokenType() == "identifier":
                 ident = ET.SubElement(rootElem, "identifier")
                 ident.text = self.tokenizer.indentifier()
+    
+    def __CompileArray(self,Element):
+        # [
+        self.tokenizer.advance()
+        symbol =ET.SubElement(Element,'symbol')
+        symbol.text=self.tokenizer.symbol()
+        # expression
+        self.CompileExpression(Element)
+        # ] 
+        self.tokenizer.advance()
+        symbol =ET.SubElement(Element,'symbol')
+        symbol.text=self.tokenizer.symbol()
+
+
+    def __CompileSubCall(self,Element):
+        # . or (
+        self.tokenizer.advance()
+        symbol =ET.SubElement(Element,'symbol')
+        symbol.text=self.tokenizer.symbol()
+        if symbol.text =='.':
+            # subroutineName
+            self.tokenizer.advance()
+            subName=ET.SubElement(Element,'identifier')
+            subName.text=self.tokenizer.indentifier()
+            # (
+            self.tokenizer.advance()
+            symbol=ET.SubElement(Element,'symbol')
+            symbol.text=self.tokenizer.symbol()
+        # expressionList
+        self.CompileExpressionList(Element)
+        # )
+        self.tokenizer.advance()
+        symbol=ET.SubElement(Element,'symbol')
+        symbol.text=self.tokenizer.symbol()
