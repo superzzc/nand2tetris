@@ -1,0 +1,70 @@
+1. symbol table
+一个.jack文件只包含一个class
+所以编译文件的时候只会有一个类作用域以及这个类作用域下的若干函数/方法作用域
+因此symboltable设计只包含两个独立的表：classTable以及subrotineTable。
+当进入一个新的函数/方法时，重置subroutineTable
+使用一个subroutineScope标志位辅助判断当前作用域，True表示在函数/方法作用域内，False表示在类作用域内
+
+compileClass  创建类作用域下的符号表classTable
+compileClassVarDec 在符号表添加 static|field entry
+compileSubroutineDec 创建函数/方法作用域下的符号表subrotineTable
+compileVarDec 在subroutineTable添加var entry
+compileParameterList 在subroutineTable添加arg entry
+
+表结构
+{name:(type,kind,index)}
+name-标识符名称
+type-数据类型，如int string
+kind-标识符种类，如static field argument var
+index-标识符索引，每种类型的标识符拥有各自独立的索引，symboltable中需要单独维护四个计数器
+
+统一三个接口处理
+kindof tyepof indexof 都从内到外在两个作用域中查找，如果都没有，再返回错误值。
+
+2. 生成VM命令的时候，需要想明白哪些细节是在VM命令之下，更底层的实现。这部分是生成VM命令时不需要考虑的。
+比如函数调用时，各个寄存器指针的设置，返回地址的入栈，函数返回时栈顶的重置，寄存器的还原等等
+这些在call 以及 ret 这两个VM命令中实现了。细节会看chap5 函数调用协议
+
+3. compileDo 需要忽略返回值，将栈顶返回值pop到temp段实现
+
+4. 对数组元素的访问，也是二次引用实现
+push local 0
+push argument 0
+add            // 只获取了基地址
+pop pointer 1  // 设置that指针为i+1
+push that 0    // 完成a[i]取值
+
+5. 赋值操作需要先编译计算右值，再计算左值，如果按扫描token的顺序先左后右，处理嵌套数组的时候就有可能导致pointer 1被覆盖
+// ---- 计算 b[a[3]] 的地址 ----
+push local 1        // b
+push local 0
+push constant 3
+add
+pop pointer 1
+push that 0         // a[3]
+add
+pop pointer 1       // THAT = b + a[3]
+
+// ---- 计算 RHS: a[3] + 3 ----
+push local 0
+push constant 3
+add
+pop pointer 1       // 覆盖了 THAT！
+push that 0
+push constant 3
+add
+
+如果是通过advance和stepback来操作token流的顺序，下面这种实现是很危险的
+# 保存右侧表达式计算结果，回到左侧处理赋值
+self.writer.writePop(Seg.TEMP, 0)
+while self.tokenizer.current_token != varName:
+    self.tokenizer.stepback()
+
+因为varName在后面的表达式中可能出现很多次，那么我是从token流后侧回到最近一次keyword let的地方行不行呢？
+很可惜，也不行，举个反例
+let a = b[ let x = 3; x ];
+当你从后往前开始扫描的时候，会命中let x =3，并不是期望的开始位置
+
+两种修改思路：
+1. 记录compilelet时候的tokenizer.index stepback一步到位回到指定index位置
+2. 处理数组的时候，先计算索引部分，再计算右值，最后在赋值回来

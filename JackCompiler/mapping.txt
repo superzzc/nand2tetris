@@ -1,0 +1,50 @@
+从jack 到 VM的标准映射
+VM命令集
+算数与逻辑命令
+add sub neg eq gt lt and or not
+
+内存访问命令
+push segment index
+pop segment index
+
+流程控制与函数调用命令
+label L1
+goto L1
+if-goto L1
+
+函数调用命令
+function name nlocals
+call name nargs
+return
+目标就是将jack语言按规则转换到上述命令集当中。标准映射参考11.2.1规则说明
+
+
+变量映射规则
+static ---> VM static 段
+field ---> VM this 段。通过设置pointer 0 为当前对象的基地址
+argument ---> VM argument 段
+var ---> VM local段
+变量声明阶段，只添加到符号表，不生成vm命令
+当使用该变量的时候，根据符号表中的kind信息进行映射并生成vm命令
+
+数组及字符串声明
+使用内置类来声明，声明仅创建引用
+举例如下
+var Array a
+a = Array.new(10)
+对应的VM命令
+push constant 10
+call Array.new 1
+pop local 0     // a = 返回的首地址
+
+数组下标出现在表达式中（如 a[i+1] + b[j]）时，栈顺序如何保证正确？
+将索引[]看做运算符，按逆波兰方式操作。入栈顺序为a i 1 + [] b j [] +
+注意间接取址的实现。假设a存储在local 0 i存储在argument0
+push local 0
+push argument 0
+add
+pop pointer 1 // 设置that指针为i+1
+push that 0   // 完成a[i+1]取值
+
+
+
